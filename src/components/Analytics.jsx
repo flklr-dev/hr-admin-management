@@ -42,31 +42,35 @@ const Analytics = () => {
   ];
 
   const metrics = [
-    {
-      title: 'Employee Growth',
-      value: '+32%',
-      description: 'vs last quarter',
+    { 
+      id: 1, 
+      title: 'Employee Growth', 
+      value: '+32%', 
+      increase: '+12%',
       icon: BiGroup,
       color: 'from-blue-500 to-blue-600'
     },
-    {
-      title: 'Avg. Time to Hire',
-      value: '18 days',
-      description: '-3 days from last month',
+    { 
+      id: 2, 
+      title: 'Time to Hire', 
+      value: '18 days', 
+      increase: '-3d',
       icon: BiTime,
       color: 'from-purple-500 to-purple-600'
     },
-    {
-      title: 'Cost per Hire',
-      value: '$4,200',
-      description: '-8% vs industry average',
+    { 
+      id: 3, 
+      title: 'Cost per Hire', 
+      value: '$4.2K', 
+      increase: '-8%',
       icon: BiDollar,
       color: 'from-green-500 to-green-600'
     },
-    {
-      title: 'ROI',
-      value: '189%',
-      description: '+12% this quarter',
+    { 
+      id: 4, 
+      title: 'ROI', 
+      value: '189%', 
+      increase: '+12%',
       icon: BiTrendingUp,
       color: 'from-orange-500 to-orange-600'
     }
@@ -102,12 +106,30 @@ const Analytics = () => {
 
   // Animated number counter for metrics
   const createNumberAnimation = (value) => {
+    let numberValue;
+    
+    if (typeof value === 'string') {
+      // Handle different string formats
+      if (value.includes('%')) {
+        numberValue = parseFloat(value.replace('%', ''));
+      } else if (value.includes('$')) {
+        numberValue = parseFloat(value.replace(/[$,K]/g, ''));
+      } else if (value.includes('days')) {
+        numberValue = parseFloat(value.replace(' days', ''));
+      } else {
+        numberValue = parseFloat(value);
+      }
+    } else {
+      numberValue = value;
+    }
+
     const { number } = useSpring({
       from: { number: 0 },
-      number: parseFloat(value.replace(/[^0-9.-]+/g, '')),
+      number: numberValue || 0,
       delay: 200,
       config: config.molasses,
     });
+    
     return number;
   };
 
@@ -129,45 +151,78 @@ const Analytics = () => {
               {/* Metrics Overview */}
               <animated.div 
                 style={metricsSpring}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
               >
-                {metrics.map((metric, index) => {
-                  const animatedValue = createNumberAnimation(metric.value);
+                {metrics.map((metric) => {
+                  const animatedValue = createNumberAnimation(
+                    typeof metric.value === 'string' 
+                      ? parseFloat(metric.value.replace(/[^0-9.-]/g, ''))
+                      : metric.value
+                  );
 
                   return (
                     <animated.div
-                      key={index}
-                      style={useSpring({
-                        from: { opacity: 0, transform: 'scale(0.9)' },
-                        to: { opacity: 1, transform: 'scale(1)' },
-                        delay: index * 100,
-                        config: config.wobbly,
-                      })}
-                      className="backdrop-blur-lg bg-white/10 rounded-2xl border border-white/10 p-6"
+                      key={metric.id}
+                      className="backdrop-blur-lg bg-white/10 rounded-2xl border border-white/10 overflow-hidden"
+                      style={{
+                        transform: useSpring({
+                          from: { scale: 1 },
+                          scale: 1,
+                          config: config.wobbly,
+                        }).scale.to(s => `scale(${s})`),
+                      }}
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-white/60 text-sm">{metric.title}</p>
-                          <animated.h3 className="text-2xl font-bold text-white mt-1">
-                            {metric.value.includes('%') 
-                              ? animatedValue.to(n => `${n.toFixed(0)}%`)
-                              : metric.value.includes('$')
-                              ? animatedValue.to(n => `$${n.toFixed(0)}`)
-                              : animatedValue.to(n => `${n.toFixed(0)} days`)}
-                          </animated.h3>
-                          <p className="text-white/60 text-xs mt-1">{metric.description}</p>
-                        </div>
+                      <div className={`p-6 relative overflow-hidden`}>
                         <animated.div 
-                          className={`bg-gradient-to-r ${metric.color} p-3 rounded-xl`}
+                          className={`absolute inset-0 bg-gradient-to-r ${metric.color} opacity-20`}
                           style={useSpring({
-                            from: { transform: 'rotate(0deg)' },
-                            to: { transform: 'rotate(360deg)' },
-                            delay: 500 + index * 100,
+                            from: { opacity: 0 },
+                            to: { opacity: 0.2 },
                             config: config.gentle,
                           })}
-                        >
-                          <metric.icon className="w-6 h-6 text-white" />
-                        </animated.div>
+                        />
+                        
+                        <div className="relative z-10">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h2 className="text-xl font-semibold text-white/90 mb-2">
+                                {metric.title}
+                              </h2>
+                              <div className="flex items-baseline">
+                                <animated.p className="text-3xl font-bold text-white">
+                                  {metric.value.includes('%') 
+                                    ? animatedValue.to(n => `${n.toFixed(0)}%`)
+                                    : metric.value.includes('$')
+                                    ? animatedValue.to(n => `$${n.toFixed(1)}K`)
+                                    : metric.value.includes('days')
+                                    ? animatedValue.to(n => `${n.toFixed(0)} days`)
+                                    : animatedValue.to(n => n.toFixed(0))}
+                                </animated.p>
+                                <animated.p 
+                                  className="ml-2 text-sm font-medium text-green-400"
+                                  style={useSpring({
+                                    from: { opacity: 0, x: -10 },
+                                    to: { opacity: 1, x: 0 },
+                                    delay: 300,
+                                  })}
+                                >
+                                  {metric.increase}
+                                </animated.p>
+                              </div>
+                            </div>
+                            <animated.div 
+                              className="p-3 bg-white/10 rounded-lg"
+                              style={useSpring({
+                                from: { rotate: 0 },
+                                to: { rotate: 360 },
+                                config: config.gentle,
+                                delay: 500,
+                              })}
+                            >
+                              <metric.icon className="w-8 h-8 text-white" />
+                            </animated.div>
+                          </div>
+                        </div>
                       </div>
                     </animated.div>
                   );

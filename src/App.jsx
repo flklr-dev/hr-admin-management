@@ -6,6 +6,9 @@ import Calendar from './components/Calendar'
 import Reports from './components/Reports'
 import Tasks from './components/Tasks'
 import Team from './components/Team'
+import Projects from './components/Projects'
+import Messages from './components/Messages'
+import Profile from './components/Profile'
 import './App.css'
 
 function App() {
@@ -22,6 +25,9 @@ function App() {
         <Route path="/hr/reports" element={<Reports />} />
         <Route path="/hr/tasks" element={<Tasks />} />
         <Route path="/hr/team" element={<Team />} />
+        <Route path="/hr/projects" element={<Projects />} />
+        <Route path="/hr/messages" element={<Messages />} />
+        <Route path="/hr/profile" element={<Profile />} />
       </Routes>
     </Router>
   )
