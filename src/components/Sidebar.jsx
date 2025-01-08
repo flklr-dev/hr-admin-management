@@ -47,10 +47,11 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen, activeTab, setActiveTab }) => 
         initial={{ x: -250 }}
         animate={{ x: isSidebarOpen ? 0 : -250 }}
         className={`fixed top-0 left-0 h-screen w-64 backdrop-blur-lg bg-white/10 border-r border-white/10 z-30
-          transform transition-transform duration-300 ease-in-out lg:translate-x-0
+          transform transition-transform duration-300 ease-in-out lg:translate-x-0 flex flex-col
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="p-4">
+        {/* Fixed Header Section */}
+        <div className="p-4 border-b border-white/10">
           {/* Logo Section */}
           <div className="flex items-center justify-between mb-8">
             <motion.div 
@@ -78,7 +79,7 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen, activeTab, setActiveTab }) => 
           </div>
 
           {/* Search Bar */}
-          <div className="mb-8">
+          <div className="mb-4">
             <div className="relative">
               <input
                 type="text"
@@ -88,20 +89,25 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen, activeTab, setActiveTab }) => 
               <BiSearch className="absolute left-3 top-2.5 text-white/50 w-5 h-5" />
             </div>
           </div>
+        </div>
 
-          {/* Navigation Sections */}
-          <NavSection 
-            title="Main Menu" 
-            items={mainNavItems} 
-            activeTab={activeTab} 
-            onItemClick={handleNavigation} 
-          />
-          <NavSection 
-            title="Resources" 
-            items={resourceNavItems} 
-            activeTab={activeTab} 
-            onItemClick={handleNavigation} 
-          />
+        {/* Scrollable Navigation Section - Hidden Scrollbar */}
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
+          <div className="p-4">
+            {/* Navigation Sections */}
+            <NavSection 
+              title="Main Menu" 
+              items={mainNavItems} 
+              activeTab={activeTab} 
+              onItemClick={handleNavigation} 
+            />
+            <NavSection 
+              title="Resources" 
+              items={resourceNavItems} 
+              activeTab={activeTab} 
+              onItemClick={handleNavigation} 
+            />
+          </div>
         </div>
       </motion.div>
     </>
